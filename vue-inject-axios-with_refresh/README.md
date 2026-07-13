@@ -1,34 +1,12 @@
-# react-auth-axios-with_refresh
+# vue-inject-axios-with_refresh
 
-Шаблон авторизации для **React + axios**.
+Шаблон авторизации для **Vue 3 + axios + provide/inject**.
 
 Примеры страниц — в `src/examples/`.
 
 ## Зависимости в целевом проекте
 
 - `axios`
-
-## Подключение
-
-1. Скопируйте папку `src/` в проект (или только нужные модули).
-2. Оберните приложение в `AuthProvider` (см. `src/examples/pages.tsx`).
-3. Настройте Vite proxy — **обязательно для dev** с httpOnly refresh cookie и `SameSite=Lax`:
-
-```ts
-// vite.config.ts
-export default defineConfig({
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-      },
-    },
-  },
-})
-```
-
-Axios уже настроен: `baseURL: '/api'`, `withCredentials: true`.
 
 ## Контракт API
 
@@ -42,46 +20,54 @@ Axios уже настроен: `baseURL: '/api'`, `withCredentials: true`.
 
 Refresh cookie: `httpOnly`, `SameSite=Lax`, `Path=/api/auth`.
 
-## Как это работает
-
-### Хранение токенов
+## Хранение токенов
 
 - **Access token** — `localStorage` (ключ `accessToken`, настраивается в `auth-config.ts`).
 - **Refresh token** — httpOnly cookie, фронт не читает и не пишет.
 
-### Init при старте / F5
+## Init при старте / F5
+
+Вызывается `await initAuth()` в `main.ts` **до** `app.mount()`.
 
 1. Читается access из `localStorage`, выставляется header.
 2. `GET /auth/me` — если успех, user в state.
 3. При неудаче — `POST /auth/refresh` (cookie) → новый access → снова `me`.
 4. Если access в storage не было — всё равно пробуется refresh (cookie могла остаться).
 5. Если ничего не сработало — гость.
+6. `loading = false` — к первой навигации init уже завершён.
 
-### Interceptor
+## Interceptor
 
 При 401 на обычных запросах — один refresh на все параллельные запросы (очередь), затем retry.
 
 Не перехватывается: `/auth/login`, `/auth/register`, `/auth/refresh`.
 
-### Register
+### Route guards
 
-После register **нет** автологина — пользователь идёт на `/login` (см. example).
+`setupAuthGuards(router)` регистрирует глобальный `beforeEach`:
+
+- `meta.requiresAuth` и нет user → `/login?returnUrl=...`
+- `meta.guestOnly` и есть user → `/`
 
 ## Структура
 
 ```
 src/
-  configs/auth-config.ts       — endpoints, ключи
-  api/api-client.ts            — axios instance, refresh, interceptor
+  configs/auth-config.ts         — endpoints, ключи
+  api/api-client.ts              — axios instance, refresh, interceptor
   utils/access-token-storage.ts
-  context/                     — AuthContext, AuthProvider
-  hooks/use-auth.ts
-  guards/                      — AuthGuard, GuestGuard
+  types/                         — user-types, auth-types, router-meta.d.ts
+  composables/use-auth.ts        — singleton state, initAuth, useAuth
+  plugins/auth-plugin.ts         — createAuthPlugin()
+  router/auth-guards.ts          — setupAuthGuards()
   examples/
-    login.tsx
-    registration.tsx
-    home.tsx
-    pages.tsx                  — маршруты
+    login.vue
+    registration.vue
+    home.vue
+    router.ts
+    main.ts
 ```
+
+## SameSite и продакшен
 
 **Рекомендуется в prod:** один домен (`app.example.com` + `app.example.com/api` через reverse proxy).

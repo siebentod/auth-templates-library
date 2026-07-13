@@ -1,1 +1,38 @@
-Небольшая библиотека шаблонов авторизации, которые удобно скармливать ИИ для приспособления к проектам. Планируется сделать еще много разновидностей и улучшать сделанные
+Небольшая библиотека шаблонов авторизации, которые удобно скармливать ИИ для приспособления к проектам. Планируется сделать еще много разновидностей и улучшать сделанные.
+
+- React:
+  - With Refresh
+    - Context
+      - [Axios](react-context-axios-with_refresh)
+      - [No Axios](react-context-fetch-with_refresh)
+    - Zustand
+      - [Axios]
+      - [No Axios]
+    - Redux
+      - [Axios]
+      - [No Axios]
+  - Only Access
+    - Context
+      - [Axios]
+      - [No Axios]
+    - Zustand
+      - [Axios]
+      - [No Axios]
+    - Redux
+      - [Axios]
+      - [No Axios]
+- Vue
+  - With Refresh
+    - Inject
+      - [Axios](vue-inject-axios-with_refresh)
+      - [No Axios](vue-inject-fetch-with_refresh)
+    - Pinia
+      - [Axios](vue-pinia-axios-with_refresh)
+      - [No Axios](vue-pinia-fetch-with_refresh)
+  - Only Access
+    - Inject
+      - [Axios]
+      - [No Axios]
+    - Pinia
+      - [Axios]
+      - [No Axios]

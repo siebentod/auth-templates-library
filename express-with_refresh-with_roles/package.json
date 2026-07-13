@@ -1,5 +1,5 @@
 {
-  "name": "express-auth-with_refresh-with_roles",
+  "name": "express-with_refresh-with_roles",
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/index.ts",
